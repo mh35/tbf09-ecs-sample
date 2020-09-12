@@ -139,3 +139,19 @@ Resources:
     Properties:
       AmazonProvidedIpv6CidrBlock: true
       VpcId: !Ref vpc
+  internetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - InternetGateway
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+  internetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref vpc
+      InternetGatewayId: !Ref internetGateway
