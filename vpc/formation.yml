@@ -1,0 +1,141 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: VPC template
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: VPC settings
+        Parameters:
+          - vpcBaseAddr
+Parameters:
+  vpcBaseAddr:
+    Type: String
+    Description: VPC base address
+Mappings:
+  RegionConfig:
+    us-east-1:
+      azNum: 6
+      subnetsNum: 12
+      cidrBits: 12
+    us-east-2:
+      azNum: 3
+      subnetsNum: 6
+      cidrBits: 13
+    us-west-1:
+      azNum: 2
+      subnetsNum: 4
+      cidrBits: 14
+    us-west-2:
+      azNum: 4
+      subnetsNum: 8
+      cidrBits: 13
+    ca-central-1:
+      azNum: 3
+      subnetsNum: 6
+      cidrBits: 13
+    ap-northeast-1:
+      azNum: 3
+      subnetsNum: 6
+      cidrBits: 13
+    ap-northeast-2:
+      azNum: 4
+      subnetsNum: 8
+      cidrBits: 13
+    ap-south-1:
+      azNum: 3
+      subnetsNum: 6
+      cidrBits: 13
+    ap-southeast-1:
+      azNum: 3
+      subnetsNum: 6
+      cidrBits: 13
+    ap-southeast-2:
+      azNum: 3
+      subnetsNum: 6
+      cidrBits: 13
+    eu-north-1:
+      azNum: 3
+      subnetsNum: 6
+      cidrBits: 13
+    eu-central-1:
+      azNum: 3
+      subnetsNum: 6
+      cidrBits: 13
+    eu-west-1:
+      azNum: 3
+      subnetsNum: 6
+      cidrBits: 13
+    eu-west-2:
+      azNum: 3
+      subnetsNum: 6
+      cidrBits: 13
+    eu-west-3:
+      azNum: 3
+      subnetsNum: 6
+      cidrBits: 13
+    sa-east-1:
+      azNum: 3
+      subnetsNum: 6
+      cidrBits: 13
+Conditions:
+  has3rdAz:
+    Fn::Or:
+      - Fn::Equals:
+        - !Ref AWS::Region
+        - 3
+      - Fn::Equals:
+        - !Ref AWS::Region
+        - 4
+      - Fn::Equals:
+        - !Ref AWS::Region
+        - 5
+      - Fn::Equals:
+        - !Ref AWS::Region
+        - 6
+  has4thAz:
+    Fn::Or:
+      - Fn::Equals:
+        - !Ref AWS::Region
+        - 4
+      - Fn::Equals:
+        - !Ref AWS::Region
+        - 5
+      - Fn::Equals:
+        - !Ref AWS::Region
+        - 6
+  has5thAz:
+    Fn::Or:
+      - Fn::Equals:
+        - !Ref AWS::Region
+        - 5
+      - Fn::Equals:
+        - !Ref AWS::Region
+        - 6
+  has6thAz:
+    Fn::Equals:
+      - !Ref AWS::Region
+      - 6
+Resources:
+  vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Join
+        - '/'
+        - - !Ref vpcBaseAddr
+          - 16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - VPC
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+  ipv6Block:
+    Type: AWS::EC2::VPCCidrBlock
+    Properties:
+      AmazonProvidedIpv6CidrBlock: true
+      VpcId: !Ref vpc
