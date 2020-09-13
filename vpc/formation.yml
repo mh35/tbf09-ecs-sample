@@ -215,7 +215,7 @@ Resources:
         Fn::Select:
           - 0
           - Fn::Cidr:
-            - Fn::Select
+            - Fn::Select:
               - 0
               - !GetAtt vpc.Ipv6CidrBlocks
             - Fn::FindInMap:
@@ -258,7 +258,7 @@ Resources:
         Fn::Select:
           - 1
           - Fn::Cidr:
-            - Fn::Select
+            - Fn::Select:
               - 0
               - !GetAtt vpc.Ipv6CidrBlocks
             - Fn::FindInMap:
@@ -301,7 +301,7 @@ Resources:
         Fn::Select:
           - 2
           - Fn::Cidr:
-            - Fn::Select
+            - Fn::Select:
               - 0
               - !GetAtt vpc.Ipv6CidrBlocks
             - Fn::FindInMap:
@@ -344,7 +344,7 @@ Resources:
         Fn::Select:
           - 3
           - Fn::Cidr:
-            - Fn::Select
+            - Fn::Select:
               - 0
               - !GetAtt vpc.Ipv6CidrBlocks
             - Fn::FindInMap:
@@ -388,7 +388,7 @@ Resources:
         Fn::Select:
           - 4
           - Fn::Cidr:
-            - Fn::Select
+            - Fn::Select:
               - 0
               - !GetAtt vpc.Ipv6CidrBlocks
             - Fn::FindInMap:
@@ -432,7 +432,7 @@ Resources:
         Fn::Select:
           - 5
           - Fn::Cidr:
-            - Fn::Select
+            - Fn::Select:
               - 0
               - !GetAtt vpc.Ipv6CidrBlocks
             - Fn::FindInMap:
@@ -476,7 +476,7 @@ Resources:
         Fn::Select:
           - 6
           - Fn::Cidr:
-            - Fn::Select
+            - Fn::Select:
               - 0
               - !GetAtt vpc.Ipv6CidrBlocks
             - Fn::FindInMap:
@@ -520,7 +520,7 @@ Resources:
         Fn::Select:
           - 7
           - Fn::Cidr:
-            - Fn::Select
+            - Fn::Select:
               - 0
               - !GetAtt vpc.Ipv6CidrBlocks
             - Fn::FindInMap:
@@ -564,7 +564,7 @@ Resources:
         Fn::Select:
           - 8
           - Fn::Cidr:
-            - Fn::Select
+            - Fn::Select:
               - 0
               - !GetAtt vpc.Ipv6CidrBlocks
             - Fn::FindInMap:
@@ -608,7 +608,7 @@ Resources:
         Fn::Select:
           - 9
           - Fn::Cidr:
-            - Fn::Select
+            - Fn::Select:
               - 0
               - !GetAtt vpc.Ipv6CidrBlocks
             - Fn::FindInMap:
@@ -652,7 +652,7 @@ Resources:
         Fn::Select:
           - 10
           - Fn::Cidr:
-            - Fn::Select
+            - Fn::Select:
               - 0
               - !GetAtt vpc.Ipv6CidrBlocks
             - Fn::FindInMap:
@@ -696,7 +696,7 @@ Resources:
         Fn::Select:
           - 11
           - Fn::Cidr:
-            - Fn::Select
+            - Fn::Select:
               - 0
               - !GetAtt vpc.Ipv6CidrBlocks
             - Fn::FindInMap:
@@ -741,36 +741,36 @@ Resources:
   publicSubnet1RouteAssoc:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: publicSubnet1
+      SubnetId: !Ref publicSubnet1
       RouteTableId: !Ref publicRouteTable
   publicSubnet2RouteAssoc:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: publicSubnet2
+      SubnetId: !Ref publicSubnet2
       RouteTableId: !Ref publicRouteTable
   publicSubnet3RouteAssoc:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Condition: has3rdAz
     Properties:
-      SubnetId: publicSubnet3
+      SubnetId: !Ref publicSubnet3
       RouteTableId: !Ref publicRouteTable
   publicSubnet4RouteAssoc:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Condition: has4thAz
     Properties:
-      SubnetId: publicSubnet4
+      SubnetId: !Ref publicSubnet4
       RouteTableId: !Ref publicRouteTable
   publicSubnet5RouteAssoc:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Condition: has5thAz
     Properties:
-      SubnetId: publicSubnet5
+      SubnetId: !Ref publicSubnet5
       RouteTableId: !Ref publicRouteTable
   publicSubnet6RouteAssoc:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Condition: has6thAz
     Properties:
-      SubnetId: publicSubnet6
+      SubnetId: !Ref publicSubnet6
       RouteTableId: !Ref publicRouteTable
   privateSubnet1RouteTable:
     Type: AWS::EC2::RouteTable
@@ -793,7 +793,7 @@ Resources:
   privateSubnet1RouteAssoc:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: privateSubnet1
+      SubnetId: !Ref privateSubnet1
       RouteTableId: !Ref privateSubnet1RouteTable
   privateSubnet2RouteTable:
     Type: AWS::EC2::RouteTable
@@ -816,7 +816,7 @@ Resources:
   privateSubnet2RouteAssoc:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: privateSubnet2
+      SubnetId: !Ref privateSubnet2
       RouteTableId: !Ref privateSubnet2RouteTable
   privateSubnet3RouteTable:
     Type: AWS::EC2::RouteTable
@@ -842,7 +842,7 @@ Resources:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Condition: has3rdAz
     Properties:
-      SubnetId: privateSubnet3
+      SubnetId: !Ref privateSubnet3
       RouteTableId: !Ref privateSubnet3RouteTable
   privateSubnet4RouteTable:
     Type: AWS::EC2::RouteTable
@@ -868,7 +868,7 @@ Resources:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Condition: has4thAz
     Properties:
-      SubnetId: privateSubnet4
+      SubnetId: !Ref privateSubnet4
       RouteTableId: !Ref privateSubnet4RouteTable
   privateSubnet5RouteTable:
     Type: AWS::EC2::RouteTable
@@ -894,7 +894,7 @@ Resources:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Condition: has5thAz
     Properties:
-      SubnetId: privateSubnet5
+      SubnetId: !Ref privateSubnet5
       RouteTableId: !Ref privateSubnet5RouteTable
   privateSubnet6RouteTable:
     Type: AWS::EC2::RouteTable
@@ -920,7 +920,7 @@ Resources:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Condition: has6thAz
     Properties:
-      SubnetId: privateSubnet6
+      SubnetId: !Ref privateSubnet6
       RouteTableId: !Ref privateSubnet6RouteTable
 Outputs:
   vpcId:
