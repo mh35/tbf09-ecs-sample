@@ -229,3 +229,553 @@ Resources:
         - Key: CostTag
           Value: !Ref AWS::StackName
     DependsOn: ipv6Block
+  privateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref vpc
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs:
+            !Ref AWS::Region
+      CidrBlock:
+        Fn::Select:
+          - 1
+          - Fn::Cidr:
+            - !GetAtt vpc.CidrBlock
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - subnetsNum
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - cidrBits
+      Ipv6CidrBlock:
+        Fn::Select:
+          - 1
+          - Fn::Cidr:
+            - Fn::Select
+              - 0
+              - !GetAtt vpc.Ipv6CidrBlocks
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - subnetsNum
+            - 64
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - PrivateSubnet1
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+    DependsOn: ipv6Block
+  publicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref vpc
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs:
+            !Ref AWS::Region
+      CidrBlock:
+        Fn::Select:
+          - 2
+          - Fn::Cidr:
+            - !GetAtt vpc.CidrBlock
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - subnetsNum
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - cidrBits
+      Ipv6CidrBlock:
+        Fn::Select:
+          - 2
+          - Fn::Cidr:
+            - Fn::Select
+              - 0
+              - !GetAtt vpc.Ipv6CidrBlocks
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - subnetsNum
+            - 64
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - PublicSubnet2
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+    DependsOn: ipv6Block
+  privateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref vpc
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs:
+            !Ref AWS::Region
+      CidrBlock:
+        Fn::Select:
+          - 3
+          - Fn::Cidr:
+            - !GetAtt vpc.CidrBlock
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - subnetsNum
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - cidrBits
+      Ipv6CidrBlock:
+        Fn::Select:
+          - 3
+          - Fn::Cidr:
+            - Fn::Select
+              - 0
+              - !GetAtt vpc.Ipv6CidrBlocks
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - subnetsNum
+            - 64
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - PrivateSubnet2
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+    DependsOn: ipv6Block
+  publicSubnet3:
+    Type: AWS::EC2::Subnet
+    Condition: has3rdAz
+    Properties:
+      VpcId: !Ref vpc
+      AvailabilityZone:
+        Fn::Select:
+          - 2
+          - Fn::GetAZs:
+            !Ref AWS::Region
+      CidrBlock:
+        Fn::Select:
+          - 4
+          - Fn::Cidr:
+            - !GetAtt vpc.CidrBlock
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - subnetsNum
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - cidrBits
+      Ipv6CidrBlock:
+        Fn::Select:
+          - 4
+          - Fn::Cidr:
+            - Fn::Select
+              - 0
+              - !GetAtt vpc.Ipv6CidrBlocks
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - subnetsNum
+            - 64
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - PublicSubnet3
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+    DependsOn: ipv6Block
+  privateSubnet3:
+    Type: AWS::EC2::Subnet
+    Condition: has3rdAz
+    Properties:
+      VpcId: !Ref vpc
+      AvailabilityZone:
+        Fn::Select:
+          - 2
+          - Fn::GetAZs:
+            !Ref AWS::Region
+      CidrBlock:
+        Fn::Select:
+          - 5
+          - Fn::Cidr:
+            - !GetAtt vpc.CidrBlock
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - subnetsNum
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - cidrBits
+      Ipv6CidrBlock:
+        Fn::Select:
+          - 5
+          - Fn::Cidr:
+            - Fn::Select
+              - 0
+              - !GetAtt vpc.Ipv6CidrBlocks
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - subnetsNum
+            - 64
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - PrivateSubnet3
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+    DependsOn: ipv6Block
+  publicSubnet4:
+    Type: AWS::EC2::Subnet
+    Condition: has4thAz
+    Properties:
+      VpcId: !Ref vpc
+      AvailabilityZone:
+        Fn::Select:
+          - 3
+          - Fn::GetAZs:
+            !Ref AWS::Region
+      CidrBlock:
+        Fn::Select:
+          - 6
+          - Fn::Cidr:
+            - !GetAtt vpc.CidrBlock
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - subnetsNum
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - cidrBits
+      Ipv6CidrBlock:
+        Fn::Select:
+          - 6
+          - Fn::Cidr:
+            - Fn::Select
+              - 0
+              - !GetAtt vpc.Ipv6CidrBlocks
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - subnetsNum
+            - 64
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - PublicSubnet4
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+    DependsOn: ipv6Block
+  privateSubnet4:
+    Type: AWS::EC2::Subnet
+    Condition: has4thAz
+    Properties:
+      VpcId: !Ref vpc
+      AvailabilityZone:
+        Fn::Select:
+          - 3
+          - Fn::GetAZs:
+            !Ref AWS::Region
+      CidrBlock:
+        Fn::Select:
+          - 7
+          - Fn::Cidr:
+            - !GetAtt vpc.CidrBlock
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - subnetsNum
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - cidrBits
+      Ipv6CidrBlock:
+        Fn::Select:
+          - 7
+          - Fn::Cidr:
+            - Fn::Select
+              - 0
+              - !GetAtt vpc.Ipv6CidrBlocks
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - subnetsNum
+            - 64
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - PrivateSubnet4
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+    DependsOn: ipv6Block
+  publicSubnet5:
+    Type: AWS::EC2::Subnet
+    Condition: has5thAz
+    Properties:
+      VpcId: !Ref vpc
+      AvailabilityZone:
+        Fn::Select:
+          - 4
+          - Fn::GetAZs:
+            !Ref AWS::Region
+      CidrBlock:
+        Fn::Select:
+          - 8
+          - Fn::Cidr:
+            - !GetAtt vpc.CidrBlock
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - subnetsNum
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - cidrBits
+      Ipv6CidrBlock:
+        Fn::Select:
+          - 8
+          - Fn::Cidr:
+            - Fn::Select
+              - 0
+              - !GetAtt vpc.Ipv6CidrBlocks
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - subnetsNum
+            - 64
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - PublicSubnet5
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+    DependsOn: ipv6Block
+  privateSubnet5:
+    Type: AWS::EC2::Subnet
+    Condition: has5thAz
+    Properties:
+      VpcId: !Ref vpc
+      AvailabilityZone:
+        Fn::Select:
+          - 4
+          - Fn::GetAZs:
+            !Ref AWS::Region
+      CidrBlock:
+        Fn::Select:
+          - 9
+          - Fn::Cidr:
+            - !GetAtt vpc.CidrBlock
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - subnetsNum
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - cidrBits
+      Ipv6CidrBlock:
+        Fn::Select:
+          - 9
+          - Fn::Cidr:
+            - Fn::Select
+              - 0
+              - !GetAtt vpc.Ipv6CidrBlocks
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - subnetsNum
+            - 64
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - PrivateSubnet5
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+    DependsOn: ipv6Block
+  publicSubnet6:
+    Type: AWS::EC2::Subnet
+    Condition: has6thAz
+    Properties:
+      VpcId: !Ref vpc
+      AvailabilityZone:
+        Fn::Select:
+          - 5
+          - Fn::GetAZs:
+            !Ref AWS::Region
+      CidrBlock:
+        Fn::Select:
+          - 10
+          - Fn::Cidr:
+            - !GetAtt vpc.CidrBlock
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - subnetsNum
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - cidrBits
+      Ipv6CidrBlock:
+        Fn::Select:
+          - 10
+          - Fn::Cidr:
+            - Fn::Select
+              - 0
+              - !GetAtt vpc.Ipv6CidrBlocks
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - subnetsNum
+            - 64
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - PublicSubnet6
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+    DependsOn: ipv6Block
+  privateSubnet6:
+    Type: AWS::EC2::Subnet
+    Condition: has6thAz
+    Properties:
+      VpcId: !Ref vpc
+      AvailabilityZone:
+        Fn::Select:
+          - 5
+          - Fn::GetAZs:
+            !Ref AWS::Region
+      CidrBlock:
+        Fn::Select:
+          - 11
+          - Fn::Cidr:
+            - !GetAtt vpc.CidrBlock
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - subnetsNum
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - cidrBits
+      Ipv6CidrBlock:
+        Fn::Select:
+          - 11
+          - Fn::Cidr:
+            - Fn::Select
+              - 0
+              - !GetAtt vpc.Ipv6CidrBlocks
+            - Fn::FindInMap:
+              - RegionConfig
+              - !Ref AWS::Region
+              - subnetsNum
+            - 64
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - PrivateSubnet6
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+    DependsOn: ipv6Block
+  publicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref vpc
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - PublicRouteTable
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+  publicSubnetIpv4Route:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref publicRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref internetGateway
+  publicSubnetIpv6Route:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref publicRouteTable
+      DestinationIpv6CidrBlock: '::/0'
+      GatewayId: !Ref internetGateway
+  publicSubnet1RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: publicSubnet1
+      RouteTableId: !Ref publicRouteTable
+  publicSubnet2RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: publicSubnet2
+      RouteTableId: !Ref publicRouteTable
+  publicSubnet3RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: has3rdAz
+    Properties:
+      SubnetId: publicSubnet3
+      RouteTableId: !Ref publicRouteTable
+  publicSubnet4RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: has4thAz
+    Properties:
+      SubnetId: publicSubnet4
+      RouteTableId: !Ref publicRouteTable
+  publicSubnet5RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: has5thAz
+    Properties:
+      SubnetId: publicSubnet5
+      RouteTableId: !Ref publicRouteTable
+  publicSubnet6RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: has6thAz
+    Properties:
+      SubnetId: publicSubnet6
+      RouteTableId: !Ref publicRouteTable
