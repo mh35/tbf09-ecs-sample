@@ -185,6 +185,11 @@ Resources:
     Properties:
       VpcId: !Ref vpc
       InternetGatewayId: !Ref internetGateway
+  egressOnlyGateway:
+    Type: AWS::EC2::EgressOnlyInternetGateway
+    Properties:
+      VpcId: !Ref vpc
+    DependsOn: ipv6Block
   publicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
@@ -263,7 +268,7 @@ Resources:
               - !Ref AWS::Region
               - subnetsNum
             - 64
-      MapPublicIpOnLaunch: false
+      AssignIpv6AddressOnCreation: true
       Tags:
         - Key: Name
           Value: !Join
@@ -351,7 +356,7 @@ Resources:
               - !Ref AWS::Region
               - subnetsNum
             - 64
-      MapPublicIpOnLaunch: true
+      AssignIpv6AddressOnCreation: true
       Tags:
         - Key: Name
           Value: !Join
@@ -441,7 +446,7 @@ Resources:
               - !Ref AWS::Region
               - subnetsNum
             - 64
-      MapPublicIpOnLaunch: false
+      AssignIpv6AddressOnCreation: true
       Tags:
         - Key: Name
           Value: !Join
@@ -531,7 +536,7 @@ Resources:
               - !Ref AWS::Region
               - subnetsNum
             - 64
-      MapPublicIpOnLaunch: false
+      AssignIpv6AddressOnCreation: true
       Tags:
         - Key: Name
           Value: !Join
@@ -621,7 +626,7 @@ Resources:
               - !Ref AWS::Region
               - subnetsNum
             - 64
-      MapPublicIpOnLaunch: false
+      AssignIpv6AddressOnCreation: true
       Tags:
         - Key: Name
           Value: !Join
@@ -711,7 +716,7 @@ Resources:
               - !Ref AWS::Region
               - subnetsNum
             - 64
-      MapPublicIpOnLaunch: false
+      AssignIpv6AddressOnCreation: true
       Tags:
         - Key: Name
           Value: !Join
@@ -779,3 +784,153 @@ Resources:
     Properties:
       SubnetId: publicSubnet6
       RouteTableId: !Ref publicRouteTable
+  privateSubnet1RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref vpc
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - PrivateSubnet1RouteTable
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+  privateSubnet1IPv6Route:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref privateSubnet1RouteTable
+      DestinationIpv6CidrBlock: '::/0'
+      EgressOnlyInternetGatewayId: !Ref egressOnlyGateway
+  privateSubnet1RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: privateSubnet1
+      RouteTableId: !Ref privateSubnet1RouteTable
+  privateSubnet2RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref vpc
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - PrivateSubnet2RouteTable
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+  privateSubnet2IPv6Route:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref privateSubnet2RouteTable
+      DestinationIpv6CidrBlock: '::/0'
+      EgressOnlyInternetGatewayId: !Ref egressOnlyGateway
+  privateSubnet2RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: privateSubnet2
+      RouteTableId: !Ref privateSubnet2RouteTable
+  privateSubnet3RouteTable:
+    Type: AWS::EC2::RouteTable
+    Condition: has3rdAz
+    Properties:
+      VpcId: !Ref vpc
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - PrivateSubnet3RouteTable
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+  privateSubnet3IPv6Route:
+    Type: AWS::EC2::Route
+    Condition: has3rdAz
+    Properties:
+      RouteTableId: !Ref privateSubnet3RouteTable
+      DestinationIpv6CidrBlock: '::/0'
+      EgressOnlyInternetGatewayId: !Ref egressOnlyGateway
+  privateSubnet3RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: has3rdAz
+    Properties:
+      SubnetId: privateSubnet3
+      RouteTableId: !Ref privateSubnet3RouteTable
+  privateSubnet4RouteTable:
+    Type: AWS::EC2::RouteTable
+    Condition: has4thAz
+    Properties:
+      VpcId: !Ref vpc
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - PrivateSubnet4RouteTable
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+  privateSubnet4IPv6Route:
+    Type: AWS::EC2::Route
+    Condition: has4thAz
+    Properties:
+      RouteTableId: !Ref privateSubnet4RouteTable
+      DestinationIpv6CidrBlock: '::/0'
+      EgressOnlyInternetGatewayId: !Ref egressOnlyGateway
+  privateSubnet4RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: has4thAz
+    Properties:
+      SubnetId: privateSubnet4
+      RouteTableId: !Ref privateSubnet4RouteTable
+  privateSubnet5RouteTable:
+    Type: AWS::EC2::RouteTable
+    Condition: has5thAz
+    Properties:
+      VpcId: !Ref vpc
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - PrivateSubnet5RouteTable
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+  privateSubnet5IPv6Route:
+    Type: AWS::EC2::Route
+    Condition: has5thAz
+    Properties:
+      RouteTableId: !Ref privateSubnet5RouteTable
+      DestinationIpv6CidrBlock: '::/0'
+      EgressOnlyInternetGatewayId: !Ref egressOnlyGateway
+  privateSubnet5RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: has5thAz
+    Properties:
+      SubnetId: privateSubnet5
+      RouteTableId: !Ref privateSubnet5RouteTable
+  privateSubnet6RouteTable:
+    Type: AWS::EC2::RouteTable
+    Condition: has6thAz
+    Properties:
+      VpcId: !Ref vpc
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - PrivateSubnet6RouteTable
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+  privateSubnet6IPv6Route:
+    Type: AWS::EC2::Route
+    Condition: has6thAz
+    Properties:
+      RouteTableId: !Ref privateSubnet6RouteTable
+      DestinationIpv6CidrBlock: '::/0'
+      EgressOnlyInternetGatewayId: !Ref egressOnlyGateway
+  privateSubnet6RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: has6thAz
+    Properties:
+      SubnetId: privateSubnet6
+      RouteTableId: !Ref privateSubnet6RouteTable
