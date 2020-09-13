@@ -197,8 +197,7 @@ Resources:
       AvailabilityZone:
         Fn::Select:
           - 0
-          - Fn::GetAZs:
-            !Ref AWS::Region
+          - Fn::GetAZs: !Ref AWS::Region
       CidrBlock:
         Fn::Select:
           - 0
@@ -241,8 +240,7 @@ Resources:
       AvailabilityZone:
         Fn::Select:
           - 0
-          - Fn::GetAZs:
-            !Ref AWS::Region
+          - Fn::GetAZs: !Ref AWS::Region
       CidrBlock:
         Fn::Select:
           - 1
@@ -285,8 +283,7 @@ Resources:
       AvailabilityZone:
         Fn::Select:
           - 1
-          - Fn::GetAZs:
-            !Ref AWS::Region
+          - Fn::GetAZs: !Ref AWS::Region
       CidrBlock:
         Fn::Select:
           - 2
@@ -329,8 +326,7 @@ Resources:
       AvailabilityZone:
         Fn::Select:
           - 1
-          - Fn::GetAZs:
-            !Ref AWS::Region
+          - Fn::GetAZs: !Ref AWS::Region
       CidrBlock:
         Fn::Select:
           - 3
@@ -374,8 +370,7 @@ Resources:
       AvailabilityZone:
         Fn::Select:
           - 2
-          - Fn::GetAZs:
-            !Ref AWS::Region
+          - Fn::GetAZs: !Ref AWS::Region
       CidrBlock:
         Fn::Select:
           - 4
@@ -419,8 +414,7 @@ Resources:
       AvailabilityZone:
         Fn::Select:
           - 2
-          - Fn::GetAZs:
-            !Ref AWS::Region
+          - Fn::GetAZs: !Ref AWS::Region
       CidrBlock:
         Fn::Select:
           - 5
@@ -464,8 +458,7 @@ Resources:
       AvailabilityZone:
         Fn::Select:
           - 3
-          - Fn::GetAZs:
-            !Ref AWS::Region
+          - Fn::GetAZs: !Ref AWS::Region
       CidrBlock:
         Fn::Select:
           - 6
@@ -509,8 +502,7 @@ Resources:
       AvailabilityZone:
         Fn::Select:
           - 3
-          - Fn::GetAZs:
-            !Ref AWS::Region
+          - Fn::GetAZs: !Ref AWS::Region
       CidrBlock:
         Fn::Select:
           - 7
@@ -554,8 +546,7 @@ Resources:
       AvailabilityZone:
         Fn::Select:
           - 4
-          - Fn::GetAZs:
-            !Ref AWS::Region
+          - Fn::GetAZs: !Ref AWS::Region
       CidrBlock:
         Fn::Select:
           - 8
@@ -599,8 +590,7 @@ Resources:
       AvailabilityZone:
         Fn::Select:
           - 4
-          - Fn::GetAZs:
-            !Ref AWS::Region
+          - Fn::GetAZs: !Ref AWS::Region
       CidrBlock:
         Fn::Select:
           - 9
@@ -644,8 +634,7 @@ Resources:
       AvailabilityZone:
         Fn::Select:
           - 5
-          - Fn::GetAZs:
-            !Ref AWS::Region
+          - Fn::GetAZs: !Ref AWS::Region
       CidrBlock:
         Fn::Select:
           - 10
@@ -689,8 +678,7 @@ Resources:
       AvailabilityZone:
         Fn::Select:
           - 5
-          - Fn::GetAZs:
-            !Ref AWS::Region
+          - Fn::GetAZs: !Ref AWS::Region
       CidrBlock:
         Fn::Select:
           - 11
