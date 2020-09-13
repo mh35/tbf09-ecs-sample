@@ -934,3 +934,101 @@ Resources:
     Properties:
       SubnetId: privateSubnet6
       RouteTableId: !Ref privateSubnet6RouteTable
+Outputs:
+  vpcId:
+    Description: VPC ID
+    Value: !Ref vpc
+    Export:
+      Name: !Join
+        - ':'
+        - - !Ref AWS::StackName
+          - vpcId
+  publicSubnets:
+    Description: Public subnet IDs
+    Value: !Join
+      - ','
+      - - !Ref publicSubnet1
+        - !Ref publicSubnet2
+        - Fn::If:
+          - has3rdAz
+          - !Ref publicSubnet3
+          - !Ref AWS::NoValue
+        - Fn::If:
+          - has4thAz
+          - !Ref publicSubnet4
+          - !Ref AWS::NoValue
+        - Fn::If:
+          - has5thAz
+          - !Ref publicSubnet5
+          - !Ref AWS::NoValue
+        - Fn::If:
+          - has6thAz
+          - !Ref publicSubnet6
+          - !Ref AWS::NoValue
+    Export:
+      Name: !Join
+        - ':'
+        - - !Ref AWS::StackName
+          - publicSubnets
+  privateSubnets:
+    Description: Private subnet IDs
+    Value: !Join
+      - ','
+      - - !Ref privateSubnet1
+        - !Ref privateSubnet2
+        - Fn::If:
+          - has3rdAz
+          - !Ref privateSubnet3
+          - !Ref AWS::NoValue
+        - Fn::If:
+          - has4thAz
+          - !Ref privateSubnet4
+          - !Ref AWS::NoValue
+        - Fn::If:
+          - has5thAz
+          - !Ref privateSubnet5
+          - !Ref AWS::NoValue
+        - Fn::If:
+          - has6thAz
+          - !Ref privateSubnet6
+          - !Ref AWS::NoValue
+    Export:
+      Name: !Join
+        - ':'
+        - - !Ref AWS::StackName
+          - privateSubnets
+  publicRouteTableId:
+    Description: Public route table ID
+    Value: !Ref publicRouteTable
+    Export:
+      Name: !Join
+        - ':'
+        - - !Ref AWS::StackName
+          - publicRouteTableId
+  privateRouteTables:
+    Description: Private route table IDs
+    Value: !Join
+      - ','
+      - - !Ref privateSubnet1RouteTable
+        - !Ref privateSubnet2RouteTable
+        - Fn::If:
+          - has3rdAz
+          - !Ref privateSubnet3RouteTable
+          - !Ref AWS::NoValue
+        - Fn::If:
+          - has4thAz
+          - !Ref privateSubnet4RouteTable
+          - !Ref AWS::NoValue
+        - Fn::If:
+          - has5thAz
+          - !Ref privateSubnet5RouteTable
+          - !Ref AWS::NoValue
+        - Fn::If:
+          - has6thAz
+          - !Ref privateSubnet6RouteTable
+          - !Ref AWS::NoValue
+    Export:
+      Name: !Join
+        - ':'
+        - - !Ref AWS::StackName
+          - privateRouteTables
