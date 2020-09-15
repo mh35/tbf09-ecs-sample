@@ -1,0 +1,253 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: VPC template
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: Common settings
+        Parameters:
+          - vpcStackName
+      -
+        Label:
+          default: NAT settings
+        Parameters:
+          - useNat
+          - natNum
+      -
+        Label:
+          default: VPC endpoint settings
+        Parameters:
+          - enableS3Endpoint
+Parameters:
+  vpcStackName:
+    Type: String
+    Description: VPC stack name
+  useNat:
+    Type: String
+    Description: NAT type(None is not want to create NAT)
+    AllowedValues:
+      - None
+      - Instance
+      - Gateway
+    Default: None
+  natNum:
+    Type: Number
+    Description: The number of NAT instance/gateway
+    MinValue: 1
+    MaxValue: 6
+    Default: 1
+  enableS3Endpoint:
+    Type: String
+    Description: Whether create S3 gateway or not
+    AllowedValues:
+      - true
+      - false
+    Default: false
+  enableEcrImageEndpoint:
+    Type: String
+    Description: Whether create ECR Docker gateway or not
+    AllowedValues:
+      - true
+      - false
+    Default: false
+  enableEcrApiEndpoint:
+    Type: String
+    Description: Whether create ECR API gateway or not
+    AllowedValues:
+      - true
+      - false
+    Default: false
+  enableCloudWatchLogsEndpoint:
+    Type: String
+    Description: Whether create CloudWatch logs gateway or not
+    AllowedValues:
+      - true
+      - false
+    Default: false
+Mappings:
+  RegionConfig:
+    us-east-1:
+      azNum: 6
+      natAmiId: ami-0f690b2f134c61108
+    us-east-2:
+      azNum: 3
+      natAmiId: ami-05cb692a03cdb7a09
+    us-west-1:
+      azNum: 2
+      natAmiId: ami-065a39a3e48d40f8f
+    us-west-2:
+      azNum: 4
+      natAmiId: ami-08d79ef2c299c9676
+    ca-central-1:
+      azNum: 3
+      natAmiId: ami-0415e034d0347c856
+    ap-northeast-1:
+      azNum: 3
+      natAmiId: ami-0b46b8b3d435574db
+    ap-northeast-2:
+      azNum: 4
+      natAmiId: ami-0864a4fea0657982c
+    ap-south-1:
+      azNum: 3
+      natAmiId: ami-018a3ed0baea6d36e
+    ap-southeast-1:
+      azNum: 3
+      natAmiId: ami-0eea67423624c4e01
+    ap-southeast-2:
+      azNum: 3
+      natAmiId: ami-0a7eeea8710a7aa0d
+    eu-north-1:
+      azNum: 3
+      natAmiId: ami-0a13f47b8a78f51e3
+    eu-central-1:
+      azNum: 3
+      natAmiId: ami-09cad5d38aaa03414
+    eu-west-1:
+      azNum: 3
+      natAmiId: ami-0771766bf53706ff2
+    eu-west-2:
+      azNum: 3
+      natAmiId: ami-046589c7fe4898d28
+    eu-west-3:
+      azNum: 3
+      natAmiId: ami-04156505753e04d84
+    sa-east-1:
+      azNum: 3
+      natAmiId: ami-0221e09c3ab2bdc5a
+  hasNatInstance:
+    Fn::Equals:
+      - !Ref useNat
+      - Instance
+  hasNatGateway:
+    Fn::Equals:
+      - !Ref useNat
+      - Gateway
+Conditions:
+  has3rdAz:
+    Fn::Or:
+      - Fn::Equals:
+        - Fn::FindInMap:
+          - RegionConfig
+          - !Ref AWS::Region
+          - azNum
+        - 3
+      - Fn::Equals:
+        - Fn::FindInMap:
+          - RegionConfig
+          - !Ref AWS::Region
+          - azNum
+        - 4
+      - Fn::Equals:
+        - Fn::FindInMap:
+          - RegionConfig
+          - !Ref AWS::Region
+          - azNum
+        - 5
+      - Fn::Equals:
+        - Fn::FindInMap:
+          - RegionConfig
+          - !Ref AWS::Region
+          - azNum
+        - 6
+  has4thAz:
+    Fn::Or:
+      - Fn::Equals:
+        - Fn::FindInMap:
+          - RegionConfig
+          - !Ref AWS::Region
+          - azNum
+        - 4
+      - Fn::Equals:
+        - Fn::FindInMap:
+          - RegionConfig
+          - !Ref AWS::Region
+          - azNum
+        - 5
+      - Fn::Equals:
+        - Fn::FindInMap:
+          - RegionConfig
+          - !Ref AWS::Region
+          - azNum
+        - 6
+  has5thAz:
+    Fn::Or:
+      - Fn::Equals:
+        - Fn::FindInMap:
+          - RegionConfig
+          - !Ref AWS::Region
+          - azNum
+        - 5
+      - Fn::Equals:
+        - Fn::FindInMap:
+          - RegionConfig
+          - !Ref AWS::Region
+          - azNum
+        - 6
+  has6thAz:
+    Fn::Equals:
+      - Fn::FindInMap:
+        - RegionConfig
+        - !Ref AWS::Region
+        - azNum
+      - 6
+Resources:
+  srcSecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Private subnet src security group
+      VpcId:
+        Fn::ImportValue: !Join
+          - ':'
+          - - !Ref vpcStackName
+            - vpcId
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - SourceSecurityGroup
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+  natInstanceSecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: NAT instance security group
+      VpcId:
+        Fn::ImportValue: !Join
+          - ':'
+          - - !Ref vpcStackName
+            - vpcId
+      SecurityGroupIngress:
+        -
+          CidrIp: 0.0.0.0/0
+          Description: SSH access from IPv4
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+        -
+          CidrIp: ::/0
+          Description: SSH access from IPv6
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+        -
+          SourceSecurityGroupId: !Ref srcSecGroup
+          Description: NAT access for TCP
+          IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+        -
+          SourceSecurityGroupId: !Ref srcSecGroup
+          Description: NAT access for UDP
+          IpProtocol: udp
+          FromPort: 0
+          ToPort: 65535
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - NatInstanceSecurityGroup
+        - Key: CostTag
+          Value: !Ref AWS::StackName
