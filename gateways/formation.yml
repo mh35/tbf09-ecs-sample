@@ -37,6 +37,26 @@ Parameters:
     MinValue: 1
     MaxValue: 6
     Default: 1
+  natInstanceType:
+    Type: String
+    Description: NAT instance type
+    AllowedValues:
+      - t3.nano
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t3.large
+      - t3.xlarge
+      - t3.2xlarge
+      - t3a.nano
+      - t3a.micro
+      - t3a.small
+      - t3a.medium
+      - t3a.large
+      - t3a.xlarge
+      - t3a.2xlarge
+      - m5.large
+      - m5.2xlarge
   enableS3Endpoint:
     Type: String
     Description: Whether create S3 gateway or not
@@ -251,3 +271,33 @@ Resources:
               - NatInstanceSecurityGroup
         - Key: CostTag
           Value: !Ref AWS::StackName
+  # See https://qiita.com/labocho/items/1ca751b09ff549a11060
+  natInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Policies:
+        -
+          PolicyName: allow-apply-modify-instanceatt
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              -
+                Effect: Allow
+                Action: 'ec2:ModifyInstanceAttribute'
+                Resource: '*'
+  natInstance:
+    Type: AWS::EC2::Instance
+    Condition: hasNatInstance
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: !Ref AWS::Region
