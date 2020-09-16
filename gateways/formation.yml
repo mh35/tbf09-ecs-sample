@@ -56,7 +56,22 @@ Parameters:
       - t3a.xlarge
       - t3a.2xlarge
       - m5.large
+      - m5.xlarge
       - m5.2xlarge
+      - m5.4xlarge
+      - m5.8xlarge
+      - m5.12xlarge
+      - m5.16xlarge
+      - m5.24xlarge
+      - m5a.large
+      - m5a.xlarge
+      - m5a.2xlarge
+      - m5a.4xlarge
+      - m5a.8xlarge
+      - m5a.12xlarge
+      - m5a.16xlarge
+      - m5a.24xlarge
+    Default: t3.micro
   enableS3Endpoint:
     Type: String
     Description: Whether create S3 gateway or not
@@ -293,7 +308,12 @@ Resources:
                 Effect: Allow
                 Action: 'ec2:ModifyInstanceAttribute'
                 Resource: '*'
-  natInstance:
+  natInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref natInstanceRole
+  natInstance1:
     Type: AWS::EC2::Instance
     Condition: hasNatInstance
     Properties:
@@ -301,3 +321,31 @@ Resources:
         Fn::Select:
           - 0
           - Fn::GetAZs: !Ref AWS::Region
+      IamInstanceProfile: !Ref natInstanceProfile
+      ImageId:
+        Fn::FindInMap:
+          - RegionConfig
+          - !Ref AWS::Region
+          - natAmiId
+      InstanceType: !Ref natInstanceType
+      NetworkInterfaces:
+        -
+          AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          GroupSet:
+            - !Ref natInstanceSecGroup
+          SubnetId:
+            Fn::Select:
+              - 0
+              - Fn::Split:
+                - ','
+                - Fn::ImportValue: !Join
+                  - ':'
+                  - - !Ref vpcStackName
+                    - publicSubnets
+      UserData:
+        Fn::Base64:
+          Fn::Sub: |
+            #!/bin/bash
+            INSTANCEID=$(curl -s -m 60 http://169.254.169.254/latest/meta-data/instance-id)
+            aws --region ${AWS::Region} ec2 modify-instance-attribute --instance-id $INSTANCEID --source-dest-check "{\"Value\": false}"
