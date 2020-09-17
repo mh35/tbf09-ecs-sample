@@ -150,14 +150,6 @@ Mappings:
     sa-east-1:
       azNum: 3
       natAmiId: ami-0221e09c3ab2bdc5a
-  hasNatInstance:
-    Fn::Equals:
-      - !Ref useNat
-      - Instance
-  hasNatGateway:
-    Fn::Equals:
-      - !Ref useNat
-      - Gateway
 Conditions:
   has3rdAz:
     Fn::Or:
@@ -226,6 +218,14 @@ Conditions:
         - !Ref AWS::Region
         - azNum
       - 6
+  hasNatInstance:
+    Fn::Equals:
+      - !Ref useNat
+      - Instance
+  hasNatGateway:
+    Fn::Equals:
+      - !Ref useNat
+      - Gateway
 Resources:
   srcSecGroup:
     Type: AWS::EC2::SecurityGroup
