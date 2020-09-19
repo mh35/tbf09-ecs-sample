@@ -7,3 +7,6 @@ RUN DEBIAN_FRONTEND=noninteractive dpkg -i /tmp/mysql-repo.deb
 RUN apt-get update
 RUN apt-get install -y build-essential mysql-community-client \
 nodejs
+COPY diary/ /diary/
+WORKDIR /diary
+RUN bundle install
