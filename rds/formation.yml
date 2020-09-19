@@ -528,3 +528,16 @@ Outputs:
         - !GetAtt dbCluster.Endpoint.Address
         - !GetAtt dbInstance.Endpoint.Address
     Description: DB endpoint address
+    Export:
+      Name: !Join
+        - ':'
+        - - !Ref AWS::StackName
+          - dbEndpoint
+  dbSrcSecurityGroup:
+    Value: !Ref dbSrcSecGroup
+    Description: DB endpoint address
+    Export:
+      Name: !Join
+        - ':'
+        - - !Ref AWS::StackName
+          - dbSrcSecurityGroup
