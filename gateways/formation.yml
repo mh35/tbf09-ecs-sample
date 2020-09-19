@@ -368,6 +368,39 @@ Conditions:
     Fn::And:
       - !Condition hasNatGateway
       - !Condition has6thNat
+  has3rdNatRoute:
+    Fn::And:
+      - !Condition hasNat
+      - !Condition has3rdAz
+  has4thNatRoute:
+    Fn::And:
+      - !Condition hasNat
+      - !Condition has4thAz
+  has5thNatRoute:
+    Fn::And:
+      - !Condition hasNat
+      - !Condition has5thAz
+  has6thNatRoute:
+    Fn::And:
+      - !Condition hasNat
+      - !Condition has6thAz
+  isSubnet4Route2:
+    Fn::And:
+      - !Condition has2ndNat
+      - Fn::Not:
+        - !Condition has3rdNat
+  isSubnet5Route2:
+    Fn::And:
+      - !Condition has3rdNat
+      - Fn::Not:
+        - !Condition has4thNat
+  isSubnet6Route2:
+    Fn::Or:
+      - !Condition isSubnet4Route2
+      - Fn::And:
+        - !Condition has4thNat
+        - Fn::Not:
+          - !Condition has5thNat
 Resources:
   srcSecGroup:
     Type: AWS::EC2::SecurityGroup
@@ -738,7 +771,7 @@ Resources:
             aws --region ${AWS::Region} ec2 modify-instance-attribute --instance-id $INSTANCEID --source-dest-check "{\"Value\": false}"
   natInstance6:
     Type: AWS::EC2::Instance
-    Condition: has5thNatInstance
+    Condition: has6thNatInstance
     Properties:
       AvailabilityZone:
         Fn::Select:
@@ -1013,6 +1046,7 @@ Resources:
               - ':'
               - - !Ref vpcStackName
                 - privateRouteTables
+      DestinationCidrBlock: '0.0.0.0/0'
       InstanceId:
         Fn::If:
           - hasNatInstance
@@ -1022,4 +1056,178 @@ Resources:
         Fn::If:
           - hasNatGateway
           - !Ref natGateway1
+          - !Ref AWS::NoValue
+  natRoute2:
+    Type: AWS::EC2::Route
+    Condition: hasNat
+    Properties:
+      RouteTableId:
+        Fn::Select:
+          - 1
+          - Fn::Split:
+            - ','
+            - Fn::ImportValue: !Join
+              - ':'
+              - - !Ref vpcStackName
+                - privateRouteTables
+      DestinationCidrBlock: '0.0.0.0/0'
+      InstanceId:
+        Fn::If:
+          - hasNatInstance
+          - Fn::If:
+            - has2ndNat
+            - !Ref natInstance2
+            - !Ref natInstance1
+          - !Ref AWS::NoValue
+      NatGatewayId:
+        Fn::If:
+          - hasNatGateway
+          - Fn::If:
+            - has2ndNat
+            - !Ref natGateway2
+            - !Ref natGateway1
+          - !Ref AWS::NoValue
+  natRoute3:
+    Type: AWS::EC2::Route
+    Condition: has3rdNatRoute
+    Properties:
+      RouteTableId:
+        Fn::Select:
+          - 2
+          - Fn::Split:
+            - ','
+            - Fn::ImportValue: !Join
+              - ':'
+              - - !Ref vpcStackName
+                - privateRouteTables
+      DestinationCidrBlock: '0.0.0.0/0'
+      InstanceId:
+        Fn::If:
+          - hasNatInstance
+          - Fn::If:
+            - has3rdNat
+            - !Ref natInstance3
+            - !Ref natInstance1
+          - !Ref AWS::NoValue
+      NatGatewayId:
+        Fn::If:
+          - hasNatGateway
+          - Fn::If:
+            - has3rdNat
+            - !Ref natGateway3
+            - !Ref natGateway1
+          - !Ref AWS::NoValue
+  natRoute4:
+    Type: AWS::EC2::Route
+    Condition: has4thNatRoute
+    Properties:
+      RouteTableId:
+        Fn::Select:
+          - 3
+          - Fn::Split:
+            - ','
+            - Fn::ImportValue: !Join
+              - ':'
+              - - !Ref vpcStackName
+                - privateRouteTables
+      DestinationCidrBlock: '0.0.0.0/0'
+      InstanceId:
+        Fn::If:
+          - hasNatInstance
+          - Fn::If:
+            - has4thNat
+            - !Ref natInstance4
+            - Fn::If:
+              - isSubnet4Route2
+              - !Ref natInstance2
+              - !Ref natInstance1
+          - !Ref AWS::NoValue
+      NatGatewayId:
+        Fn::If:
+          - hasNatGateway
+          - Fn::If:
+            - has4thNat
+            - !Ref natGateway4
+            - Fn::If:
+              - isSubnet4Route2
+              - !Ref natGateway2
+              - !Ref natGateway1
+          - !Ref AWS::NoValue
+  natRoute5:
+    Type: AWS::EC2::Route
+    Condition: has5thNatRoute
+    Properties:
+      RouteTableId:
+        Fn::Select:
+          - 4
+          - Fn::Split:
+            - ','
+            - Fn::ImportValue: !Join
+              - ':'
+              - - !Ref vpcStackName
+                - privateRouteTables
+      DestinationCidrBlock: '0.0.0.0/0'
+      InstanceId:
+        Fn::If:
+          - hasNatInstance
+          - Fn::If:
+            - has5thNat
+            - !Ref natInstance5
+            - Fn::If:
+              - isSubnet5Route2
+              - !Ref natInstance2
+              - !Ref natInstance1
+          - !Ref AWS::NoValue
+      NatGatewayId:
+        Fn::If:
+          - hasNatGateway
+          - Fn::If:
+            - has5thNat
+            - !Ref natGateway5
+            - Fn::If:
+              - isSubnet5Route2
+              - !Ref natGateway2
+              - !Ref natGateway1
+          - !Ref AWS::NoValue
+  natRoute6:
+    Type: AWS::EC2::Route
+    Condition: has6thNatRoute
+    Properties:
+      RouteTableId:
+        Fn::Select:
+          - 5
+          - Fn::Split:
+            - ','
+            - Fn::ImportValue: !Join
+              - ':'
+              - - !Ref vpcStackName
+                - privateRouteTables
+      DestinationCidrBlock: '0.0.0.0/0'
+      InstanceId:
+        Fn::If:
+          - hasNatInstance
+          - Fn::If:
+            - has6thNat
+            - !Ref natInstance6
+            - Fn::If:
+              - isSubnet5Route2
+              - !Ref natInstance3
+              - Fn::If:
+                - isSubnet6Route2
+                - !Ref natInstance2
+                - !Ref natInstance1
+          - !Ref AWS::NoValue
+      NatGatewayId:
+        Fn::If:
+          - hasNatGateway
+          - Fn::If:
+            - has6thNat
+            - !Ref natGateway6
+            - Fn::If:
+              - isSubnet5Route2
+              - !Ref natGateway3
+              - Fn::If:
+                - isSubnet6Route2
+                - !Ref natGateway2
+                - !Ref natGateway1
           - !Ref AWS::NoValue
