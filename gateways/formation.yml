@@ -401,6 +401,22 @@ Conditions:
         - !Condition has4thNat
         - Fn::Not:
           - !Condition has5thNat
+  hasS3Endpoint:
+    Fn::Equals:
+      - !Ref enableS3Endpoint
+      - true
+  hasEcrImageEndpoint:
+    Fn::Equals:
+      - !Ref enableEcrImageEndpoint
+      - true
+  hasEcrApiEndpoint:
+    Fn::Equals:
+      - !Ref enableEcrApiEndpoint
+      - true
+  hasCloudWatchLogsEndpoint:
+    Fn::Equals:
+      - !Ref enableCloudWatchLogsEndpoint
+      - true
 Resources:
   srcSecGroup:
     Type: AWS::EC2::SecurityGroup
@@ -1231,3 +1247,25 @@ Resources:
                 - !Ref natGateway2
                 - !Ref natGateway1
           - !Ref AWS::NoValue
+  s3Endpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Condition: hasS3Endpoint
+    Properties:
+      VpcId:
+        Fn::ImportValue: !Join
+          - ':'
+          - - !Ref vpcStackName
+            - vpcId
+      VpcEndpointType: Gateway
+      ServiceName: !Join
+        - '.'
+        - - com.amazonaws
+          - !Ref AWS::Region
+          - s3
+      RouteTableIds:
+        Fn::Split:
+          - ','
+          - Fn::ImportValue: !Join
+            - ':'
+            - - !Ref vpcStackName
+              - privateRouteTables
