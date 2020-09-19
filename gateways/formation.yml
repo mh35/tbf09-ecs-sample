@@ -83,6 +83,10 @@ Parameters:
       - unlimited
       - standard
     Default: standard
+  natInstanceKeyPair:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: EC2 key pair name
+    Default: ''
   enableS3Endpoint:
     Type: String
     Description: Whether create S3 gateway or not
@@ -286,6 +290,35 @@ Conditions:
         - Fn::Equals:
           - !Ref natNum
           - 6
+  has4thNat:
+    Fn::And:
+      - !Condition has4thAz
+      - Fn::Or:
+        - Fn::Equals:
+          - !Ref natNum
+          - 4
+        - Fn::Equals:
+          - !Ref natNum
+          - 5
+        - Fn::Equals:
+          - !Ref natNum
+          - 6
+  has5thNat:
+    Fn::And:
+      - !Condition has5thAz
+      - Fn::Or:
+        - Fn::Equals:
+          - !Ref natNum
+          - 5
+        - Fn::Equals:
+          - !Ref natNum
+          - 6
+  has6thNat:
+    Fn::And:
+      - !Condition has6thAz
+      - Fn::Equals:
+        - !Ref natNum
+        - 6
   has2ndNatInstance:
     Fn::And:
       - !Condition hasNatInstance
@@ -294,6 +327,23 @@ Conditions:
     Fn::And:
       - !Condition hasNatInstance
       - !Condition has3rdNat
+  has4thNatInstance:
+    Fn::And:
+      - !Condition hasNatInstance
+      - !Condition has4thNat
+  has5thNatInstance:
+    Fn::And:
+      - !Condition hasNatInstance
+      - !Condition has5thNat
+  has6thNatInstance:
+    Fn::And:
+      - !Condition hasNatInstance
+      - !Condition has6thNat
+  hasNatInstanceKeyPair:
+    Fn::Not:
+      - Fn::Equals:
+        - !Ref natInstanceKeyPair
+        - ''
 Resources:
   srcSecGroup:
     Type: AWS::EC2::SecurityGroup
@@ -409,6 +459,11 @@ Resources:
           - isMicroInstance
           - CPUCredits: !Ref cpuCreditStyle
           - !Ref AWS::NoValue
+      KeyName:
+        Fn::If:
+          - hasNatInstanceKeyPair
+          - !Ref natInstanceKeyPair
+          - !Ref AWS::NoValue
       NetworkInterfaces:
         -
           AssociatePublicIpAddress: true
@@ -430,6 +485,276 @@ Resources:
             - '-'
             - - !Ref AWS::StackName
               - NatInstance1
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+      UserData:
+        Fn::Base64:
+          Fn::Sub: |
+            #!/bin/bash
+            INSTANCEID=$(curl -s -m 60 http://169.254.169.254/latest/meta-data/instance-id)
+            aws --region ${AWS::Region} ec2 modify-instance-attribute --instance-id $INSTANCEID --source-dest-check "{\"Value\": false}"
+  natInstance2:
+    Type: AWS::EC2::Instance
+    Condition: has2ndNatInstance
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs: !Ref AWS::Region
+      IamInstanceProfile: !Ref natInstanceProfile
+      ImageId:
+        Fn::FindInMap:
+          - RegionConfig
+          - !Ref AWS::Region
+          - natAmiId
+      InstanceType: !Ref natInstanceType
+      CreditSpecification:
+        Fn::If:
+          - isMicroInstance
+          - CPUCredits: !Ref cpuCreditStyle
+          - !Ref AWS::NoValue
+      KeyName:
+        Fn::If:
+          - hasNatInstanceKeyPair
+          - !Ref natInstanceKeyPair
+          - !Ref AWS::NoValue
+      NetworkInterfaces:
+        -
+          AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          GroupSet:
+            - !Ref natInstanceSecGroup
+          SubnetId:
+            Fn::Select:
+              - 1
+              - Fn::Split:
+                - ','
+                - Fn::ImportValue: !Join
+                  - ':'
+                  - - !Ref vpcStackName
+                    - publicSubnets
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - NatInstance2
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+      UserData:
+        Fn::Base64:
+          Fn::Sub: |
+            #!/bin/bash
+            INSTANCEID=$(curl -s -m 60 http://169.254.169.254/latest/meta-data/instance-id)
+            aws --region ${AWS::Region} ec2 modify-instance-attribute --instance-id $INSTANCEID --source-dest-check "{\"Value\": false}"
+  natInstance3:
+    Type: AWS::EC2::Instance
+    Condition: has3rdNatInstance
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 2
+          - Fn::GetAZs: !Ref AWS::Region
+      IamInstanceProfile: !Ref natInstanceProfile
+      ImageId:
+        Fn::FindInMap:
+          - RegionConfig
+          - !Ref AWS::Region
+          - natAmiId
+      InstanceType: !Ref natInstanceType
+      CreditSpecification:
+        Fn::If:
+          - isMicroInstance
+          - CPUCredits: !Ref cpuCreditStyle
+          - !Ref AWS::NoValue
+      KeyName:
+        Fn::If:
+          - hasNatInstanceKeyPair
+          - !Ref natInstanceKeyPair
+          - !Ref AWS::NoValue
+      NetworkInterfaces:
+        -
+          AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          GroupSet:
+            - !Ref natInstanceSecGroup
+          SubnetId:
+            Fn::Select:
+              - 2
+              - Fn::Split:
+                - ','
+                - Fn::ImportValue: !Join
+                  - ':'
+                  - - !Ref vpcStackName
+                    - publicSubnets
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - NatInstance3
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+      UserData:
+        Fn::Base64:
+          Fn::Sub: |
+            #!/bin/bash
+            INSTANCEID=$(curl -s -m 60 http://169.254.169.254/latest/meta-data/instance-id)
+            aws --region ${AWS::Region} ec2 modify-instance-attribute --instance-id $INSTANCEID --source-dest-check "{\"Value\": false}"
+  natInstance4:
+    Type: AWS::EC2::Instance
+    Condition: has4thNatInstance
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 3
+          - Fn::GetAZs: !Ref AWS::Region
+      IamInstanceProfile: !Ref natInstanceProfile
+      ImageId:
+        Fn::FindInMap:
+          - RegionConfig
+          - !Ref AWS::Region
+          - natAmiId
+      InstanceType: !Ref natInstanceType
+      CreditSpecification:
+        Fn::If:
+          - isMicroInstance
+          - CPUCredits: !Ref cpuCreditStyle
+          - !Ref AWS::NoValue
+      KeyName:
+        Fn::If:
+          - hasNatInstanceKeyPair
+          - !Ref natInstanceKeyPair
+          - !Ref AWS::NoValue
+      NetworkInterfaces:
+        -
+          AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          GroupSet:
+            - !Ref natInstanceSecGroup
+          SubnetId:
+            Fn::Select:
+              - 3
+              - Fn::Split:
+                - ','
+                - Fn::ImportValue: !Join
+                  - ':'
+                  - - !Ref vpcStackName
+                    - publicSubnets
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - NatInstance4
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+      UserData:
+        Fn::Base64:
+          Fn::Sub: |
+            #!/bin/bash
+            INSTANCEID=$(curl -s -m 60 http://169.254.169.254/latest/meta-data/instance-id)
+            aws --region ${AWS::Region} ec2 modify-instance-attribute --instance-id $INSTANCEID --source-dest-check "{\"Value\": false}"
+  natInstance5:
+    Type: AWS::EC2::Instance
+    Condition: has5thNatInstance
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 4
+          - Fn::GetAZs: !Ref AWS::Region
+      IamInstanceProfile: !Ref natInstanceProfile
+      ImageId:
+        Fn::FindInMap:
+          - RegionConfig
+          - !Ref AWS::Region
+          - natAmiId
+      InstanceType: !Ref natInstanceType
+      CreditSpecification:
+        Fn::If:
+          - isMicroInstance
+          - CPUCredits: !Ref cpuCreditStyle
+          - !Ref AWS::NoValue
+      KeyName:
+        Fn::If:
+          - hasNatInstanceKeyPair
+          - !Ref natInstanceKeyPair
+          - !Ref AWS::NoValue
+      NetworkInterfaces:
+        -
+          AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          GroupSet:
+            - !Ref natInstanceSecGroup
+          SubnetId:
+            Fn::Select:
+              - 4
+              - Fn::Split:
+                - ','
+                - Fn::ImportValue: !Join
+                  - ':'
+                  - - !Ref vpcStackName
+                    - publicSubnets
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - NatInstance5
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+      UserData:
+        Fn::Base64:
+          Fn::Sub: |
+            #!/bin/bash
+            INSTANCEID=$(curl -s -m 60 http://169.254.169.254/latest/meta-data/instance-id)
+            aws --region ${AWS::Region} ec2 modify-instance-attribute --instance-id $INSTANCEID --source-dest-check "{\"Value\": false}"
+  natInstance6:
+    Type: AWS::EC2::Instance
+    Condition: has5thNatInstance
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - 5
+          - Fn::GetAZs: !Ref AWS::Region
+      IamInstanceProfile: !Ref natInstanceProfile
+      ImageId:
+        Fn::FindInMap:
+          - RegionConfig
+          - !Ref AWS::Region
+          - natAmiId
+      InstanceType: !Ref natInstanceType
+      CreditSpecification:
+        Fn::If:
+          - isMicroInstance
+          - CPUCredits: !Ref cpuCreditStyle
+          - !Ref AWS::NoValue
+      KeyName:
+        Fn::If:
+          - hasNatInstanceKeyPair
+          - !Ref natInstanceKeyPair
+          - !Ref AWS::NoValue
+      NetworkInterfaces:
+        -
+          AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          GroupSet:
+            - !Ref natInstanceSecGroup
+          SubnetId:
+            Fn::Select:
+              - 5
+              - Fn::Split:
+                - ','
+                - Fn::ImportValue: !Join
+                  - ':'
+                  - - !Ref vpcStackName
+                    - publicSubnets
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - NatInstance6
         - Key: CostTag
           Value: !Ref AWS::StackName
       UserData:
