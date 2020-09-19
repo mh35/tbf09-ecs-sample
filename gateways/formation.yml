@@ -1376,3 +1376,12 @@ Resources:
             - ':'
             - - !Ref vpcStackName
               - privateSubnets
+Outputs:
+  sourceSecGroup:
+    Description: Source security group
+    Value: !Ref srcSecGroup
+    Export:
+      Name: !Join
+        - ':'
+        - - !Ref AWS::StackName
+          - sourceSecGroup
