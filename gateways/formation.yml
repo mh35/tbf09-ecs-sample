@@ -15,6 +15,8 @@ Metadata:
           - useNat
           - natNum
           - natInstanceType
+          - cpuCreditStyle
+          - natInstanceKeyPair
       -
         Label:
           default: VPC endpoint settings
@@ -417,6 +419,11 @@ Conditions:
     Fn::Equals:
       - !Ref enableCloudWatchLogsEndpoint
       - true
+  hasInterfaceEndpoints:
+    Fn::Or:
+      - !Condition hasEcrImageEndpoint
+      - !Condition hasEcrApiEndpoint
+      - !Condition hasCloudWatchLogsEndpoint
 Resources:
   srcSecGroup:
     Type: AWS::EC2::SecurityGroup
@@ -1269,3 +1276,103 @@ Resources:
             - ':'
             - - !Ref vpcStackName
               - privateRouteTables
+  intarfaceEndpointsSecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Condition: hasInterfaceEndpoints
+    Properties:
+      GroupDescription: VPC endpoints security group
+      VpcId:
+        Fn::ImportValue: !Join
+          - ':'
+          - - !Ref vpcStackName
+            - vpcId
+      SecurityGroupIngress:
+        -
+          SourceSecurityGroupId: !Ref srcSecGroup
+          Description: VPC endpoint access
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - InterfaceEndpointsSecurityGroup
+        - Key: CostTag
+          Value: !Ref AWS::StackName
+  ecrImageEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Condition: hasEcrImageEndpoint
+    Properties:
+      VpcId:
+        Fn::ImportValue: !Join
+          - ':'
+          - - !Ref vpcStackName
+            - vpcId
+      VpcEndpointType: Interface
+      ServiceName: !Join
+        - '.'
+        - - com.amazonaws
+          - !Ref AWS::Region
+          - ecr.dkr
+      SecurityGroupIds:
+        - !Ref intarfaceEndpointsSecGroup
+      PrivateDnsEnabled: true
+      SubnetIds:
+        Fn::Split:
+          - ','
+          - Fn::ImportValue: !Join
+            - ':'
+            - - !Ref vpcStackName
+              - privateSubnets
+  ecrApiEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Condition: hasEcrApiEndpoint
+    Properties:
+      VpcId:
+        Fn::ImportValue: !Join
+          - ':'
+          - - !Ref vpcStackName
+            - vpcId
+      VpcEndpointType: Interface
+      ServiceName: !Join
+        - '.'
+        - - com.amazonaws
+          - !Ref AWS::Region
+          - ecr.api
+      SecurityGroupIds:
+        - !Ref intarfaceEndpointsSecGroup
+      PrivateDnsEnabled: true
+      SubnetIds:
+        Fn::Split:
+          - ','
+          - Fn::ImportValue: !Join
+            - ':'
+            - - !Ref vpcStackName
+              - privateSubnets
+  cloudWatchLogsEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Condition: hasCloudWatchLogsEndpoint
+    Properties:
+      VpcId:
+        Fn::ImportValue: !Join
+          - ':'
+          - - !Ref vpcStackName
+            - vpcId
+      VpcEndpointType: Interface
+      ServiceName: !Join
+        - '.'
+        - - com.amazonaws
+          - !Ref AWS::Region
+          - logs
+      SecurityGroupIds:
+        - !Ref intarfaceEndpointsSecGroup
+      PrivateDnsEnabled: true
+      SubnetIds:
+        Fn::Split:
+          - ','
+          - Fn::ImportValue: !Join
+            - ':'
+            - - !Ref vpcStackName
+              - privateSubnets
