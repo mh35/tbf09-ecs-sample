@@ -14,11 +14,15 @@ Metadata:
         Parameters:
           - useNat
           - natNum
+          - natInstanceType
       -
         Label:
           default: VPC endpoint settings
         Parameters:
           - enableS3Endpoint
+          - enableEcrImageEndpoint
+          - enableEcrApiEndpoint
+          - enableCloudWatchLogsEndpoint
 Parameters:
   vpcStackName:
     Type: String
@@ -72,6 +76,13 @@ Parameters:
       - m5a.16xlarge
       - m5a.24xlarge
     Default: t3.micro
+  cpuCreditStyle:
+    Type: String
+    Description: Unlimited or standard for NAT t3/t3a instance
+    AllowedValues:
+      - unlimited
+      - standard
+    Default: standard
   enableS3Endpoint:
     Type: String
     Description: Whether create S3 gateway or not
@@ -226,6 +237,63 @@ Conditions:
     Fn::Equals:
       - !Ref useNat
       - Gateway
+  isMicroInstance:
+    Fn::Or:
+      - Fn::Equals:
+        - Fn::Select:
+          - 0
+          - Fn::Split:
+            - '.'
+            - !Ref natInstanceType
+        - t3
+      - Fn::Equals:
+        - Fn::Select:
+          - 0
+          - Fn::Split:
+            - '.'
+            - !Ref natInstanceType
+        - t3a
+  has2ndNat:
+    Fn::Or:
+      - Fn::Equals:
+        - !Ref natNum
+        - 2
+      - Fn::Equals:
+        - !Ref natNum
+        - 3
+      - Fn::Equals:
+        - !Ref natNum
+        - 4
+      - Fn::Equals:
+        - !Ref natNum
+        - 5
+      - Fn::Equals:
+        - !Ref natNum
+        - 6
+  has3rdNat:
+    Fn::And:
+      - !Condition has3rdAz
+      - Fn::Or:
+        - Fn::Equals:
+          - !Ref natNum
+          - 3
+        - Fn::Equals:
+          - !Ref natNum
+          - 4
+        - Fn::Equals:
+          - !Ref natNum
+          - 5
+        - Fn::Equals:
+          - !Ref natNum
+          - 6
+  has2ndNatInstance:
+    Fn::And:
+      - !Condition hasNatInstance
+      - !Condition has2ndNat
+  has3rdNatInstance:
+    Fn::And:
+      - !Condition hasNatInstance
+      - !Condition has3rdNat
 Resources:
   srcSecGroup:
     Type: AWS::EC2::SecurityGroup
@@ -308,6 +376,14 @@ Resources:
                 Effect: Allow
                 Action: 'ec2:ModifyInstanceAttribute'
                 Resource: '*'
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - NatInstanceRole
+        - Key: CostTag
+          Value: !Ref AWS::StackName
   natInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
@@ -328,6 +404,11 @@ Resources:
           - !Ref AWS::Region
           - natAmiId
       InstanceType: !Ref natInstanceType
+      CreditSpecification:
+        Fn::If:
+          - isMicroInstance
+          - CPUCredits: !Ref cpuCreditStyle
+          - !Ref AWS::NoValue
       NetworkInterfaces:
         -
           AssociatePublicIpAddress: true
@@ -343,6 +424,14 @@ Resources:
                   - ':'
                   - - !Ref vpcStackName
                     - publicSubnets
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref AWS::StackName
+              - NatInstance1
+        - Key: CostTag
+          Value: !Ref AWS::StackName
       UserData:
         Fn::Base64:
           Fn::Sub: |
