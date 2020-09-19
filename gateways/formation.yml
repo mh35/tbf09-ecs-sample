@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: VPC template
+Description: Endpoints template
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
