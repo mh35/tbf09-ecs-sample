@@ -460,7 +460,7 @@ Resources:
           FromPort: 22
           ToPort: 22
         -
-          CidrIp: ::/0
+          CidrIpv6: ::/0
           Description: SSH access from IPv6
           IpProtocol: tcp
           FromPort: 22
