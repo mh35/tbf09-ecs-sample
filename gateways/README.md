@@ -1,0 +1,11 @@
+# 各種ゲートウェイ・エンドポイント定義
+
+このスタックでは、NATとVPCエンドポイントを定義します。パラメータは以下の通り指定してください。
+
+1. vpcStackNameにはVPCスタック名を指定してください
+2. useNatには使用するNATを指定してください。Noneならなし、InstanceならNATインスタンス、GatewayならNATゲートウェイです
+3. natNumには使用するNATの数を指定します
+4. natInstanceTypeはuseNat=Instanceのときに、そのインスタンスのタイプを指定します。特に問題がなければt3.nanoもしくはt3.microを推奨します。大きなインスタンスはコストパフォーマンスが悪いためです
+5. cpuCreditStyleはuseNat=Instanceで、natInstanceTypeがt3もしくはt3aのときにT3 Unlimitedを有効にするかを指定します。standardは無効、unlimitedは有効です
+6. natInstanceKeyPairはuseNat=Instanceのときに、NATインスタンスで使用するキーペアを指定します。指定しない場合、SSHでのログインができなくなります
+7. enableS3Endpoint・enableEcrImageEndpoint・enableEcrApiEndpoint・enableCloudWatchLogsEndpointはそれぞれS3・ECR Image・ECR API・CloudWatch LogsのVPCエンドポイントを有効にするかを指定します。
