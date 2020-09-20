@@ -1,0 +1,14 @@
+<h1><%= @article.title %></h1>
+<p><span><%= @article.user.name %></span>
+<time datetime="<%= @article.created_at.strftime(
+  '%FT%T') %>"><%= @article.created_at.strftime(
+  '%Y/%m/%d %T') %></time></p>
+</header>
+<p><%= @article.content %></p>
+<% if @current_user && @article.user_id == @current_user.id %>
+<p><%= link_to '編集', edit_article_path(@article) %></p>
+<%= form_with url: article_path(
+  @article), method: 'DELETE' do |form| %>
+<p><%= form.submit '削除' %></p>
+<% end %>
+<% end %>

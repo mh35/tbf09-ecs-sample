@@ -1,0 +1,7 @@
+<h1>記事新規作成</h1>
+<%= form_with model: @article do |form| %>
+<p><label>タイトル<%= form.text_field :title %></label></p>
+<p><label>本文<br />
+<%= form.text_area :content %></label></p>
+<p><%= form.submit '作成' %></p>
+<% end %>

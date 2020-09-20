@@ -1,0 +1,13 @@
+<h1>記事一覧</h1>
+<% @articles.each do |article| %>
+<article>
+<header>
+<h2><%= link_to article.title, article_path(article) %></h2>
+<p><span><%= article.user.name %></span>
+<time datetime="<%= article.created_at.strftime(
+  '%FT%T') %>"><%= article.created_at.strftime(
+  '%Y/%m/%d %T') %></time></p>
+</header>
+<p><%= article.content %></p>
+</article>
+<% end %>

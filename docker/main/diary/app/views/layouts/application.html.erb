@@ -10,6 +10,21 @@
   </head>
 
   <body>
+    <header>
+      <% if @current_user %>
+        <p>ようこそ、<%= @current_user.name %>さん</p>
+        <p><%= link_to '記事新規作成',
+        controller: 'articles', action: 'new' %></p>
+        <%= form_with url: url_for(
+          controller: 'logout', action: 'index') do |form| %>
+          <p><%= form.submit 'ログアウト' %></p>
+        <% end %>
+      <% else %>
+        <p>ようこそ、ゲストさん <%=
+        link_to 'ログイン',
+        controller: 'login', action: 'index' %></p>
+      <% end %>
+    </header>
     <%= yield %>
   </body>
 </html>

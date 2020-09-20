@@ -1,0 +1,9 @@
+<h1>ログイン</h1>
+<%= form_with url: url_for(controller: :login,
+  action: :do_login) do |form| %>
+  <p><label>ユーザー名<%=
+  form.text_field :username %></label></p>
+  <p><label>パスワード<%=
+  form.password_field :password %></label></p>
+  <p><%= form.submit 'ログイン' %></p>
+<% end %>
