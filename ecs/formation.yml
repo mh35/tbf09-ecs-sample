@@ -333,7 +333,7 @@ Resources:
                   - - !Ref rdsStackName
                     - dbEndpoint
             - Name: DIARY_DATABASE_PASSWORD
-              Value: dbPassword
+              Value: !Ref dbPassword
       Tags:
         - Key: Name
           Value: !Join
