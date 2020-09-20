@@ -450,7 +450,7 @@ Resources:
         Fn::If:
           - isAurora
           - !Ref AWS::NoValue
-          - - dbSecGroup
+          - - !Ref dbSecGroup
       StorageType:
         Fn::If:
           - isAurora
