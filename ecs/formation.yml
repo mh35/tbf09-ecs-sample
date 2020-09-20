@@ -26,6 +26,7 @@ Metadata:
           - cpuValue
           - memoryValue
           - imageTag
+Parameters:
   vpcStackName:
     Type: String
     Description: VPC stack name
@@ -360,7 +361,7 @@ Resources:
           AssignPublicIp: DISABLED
           SecurityGroups:
             -
-              Fn:ImportValue: !Join
+              Fn::ImportValue: !Join
                 - ':'
                 - - !Ref gatewaysStackName
                   - sourceSecGroup
