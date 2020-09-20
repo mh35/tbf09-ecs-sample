@@ -13,3 +13,9 @@ WORKDIR /diary
 RUN bundle install
 RUN npm install -g yarn
 RUN yarn install
+RUN bundle exec rails assets:precompile
+COPY entrypoint.sh /usr/bin/
+RUN chmod a+x /usr/bin/entrypoint.sh
+ENTRYPOINT [ "entrypoint.sh" ]
+EXPOSE 3000
+CMD [ "rails", "server", "-b", "0.0.0.0" ]
