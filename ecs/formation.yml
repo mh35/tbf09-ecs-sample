@@ -318,21 +318,21 @@ Resources:
               HostPort: 3000
               Protocol: tcp
           Environment:
-            - Key: RAILS_ENV
+            - Name: RAILS_ENV
               Value: production
-            - Key: RAILS_MASTER_KEY
+            - Name: RAILS_MASTER_KEY
               Value: !Ref railsMasterKey
-            - Key: DIARY_DATABASE_NAME
+            - Name: DIARY_DATABASE_NAME
               Value: !Ref dbName
-            - Key: DIARY_DATABASE_USER
+            - Name: DIARY_DATABASE_USER
               Value: !Ref dbUsername
-            - Key: DIARY_DATABASE_HOST
+            - Name: DIARY_DATABASE_HOST
               Value:
                 Fn::ImportValue: !Join
                   - ':'
                   - - !Ref rdsStackName
                     - dbEndpoint
-            - Key: DIARY_DATABASE_PASSWORD
+            - Name: DIARY_DATABASE_PASSWORD
               Value: dbPassword
       Tags:
         - Key: Name
