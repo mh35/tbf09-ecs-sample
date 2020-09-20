@@ -6,6 +6,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: hogehoge
       MYSQL_DATABASE: diary
+    volumes:
+        - ./test_db/data:/var/lib/mysql
     ports:
       - '23306:3306'
   web:
