@@ -19,6 +19,11 @@ Metadata:
           - dbTimezone
           - dbCharset
           - dbName
+          - dbUsername
+          - dbPassword
+          - dbStorageSize
+          - dbStorageMaxSize
+          - isMultiAz
 Parameters:
   vpcStackName:
     Type: String
