@@ -1,0 +1,12 @@
+# ECS・ロードバランサー定義
+
+このスタックではECSの各種リソースとロードバランサーを定義します。パラメータには以下の通り指定してください。
+
+1. vpcStackName・gatewaysStackName・ecrStackName・rdsStackNameにはそれぞれVPCスタック、ゲートウェイスタック、ECRスタック、RDSスタックの名前を指定してください
+2. dbName・dbUsername・dbPasswordにはRDSスタックで指定したデータベースの設定を指定してください
+3. containerPortにはコンテナで開放したポート番号を指定してください。デフォルトでは3000番になっています
+4. cpuValueにはCPUの値を指定してください。256が0.25CPU、512が0.5CPU、1024が1CPU、2048が2CPU、4096が4CPUです
+5. memoryValueにはメモリ量をMB単位で指定してください。cpuValueにより、可能な値は制約されます
+6. imageTagにはECRにpushしたイメージのタグを指定してください
+7. desiredContainersCountには起動しておきたいコンテナの数を指定してください
+8. railsMasterKeyにはRailsのマスターキーを指定してください
