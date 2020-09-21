@@ -483,6 +483,11 @@ Resources:
           - !Ref AWS::NoValue
           - !Ref dbPassword
       DBParameterGroupName: !Ref dbParamGroup
+      DBName:
+        Fn::If:
+          - isAurora
+          - !Ref AWS::NoValue
+          - !Ref dbName
       DBSubnetGroupName: !Ref dbSubnetGroup
       PubliclyAccessible: false
       MultiAZ:
