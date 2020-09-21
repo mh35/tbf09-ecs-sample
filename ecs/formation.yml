@@ -334,6 +334,8 @@ Resources:
                     - dbEndpoint
             - Name: DIARY_DATABASE_PASSWORD
               Value: !Ref dbPassword
+            - Name: RAILS_SERVE_STATIC_FILES
+              Value: 1
       Tags:
         - Key: Name
           Value: !Join
